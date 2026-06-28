@@ -16,40 +16,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Build TWA APK
+        uses: chromeos/twa-action@v1
         with:
-          node-version: '20'
-
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
-      - name: Init TWA project
-        run: |
-          mkdir twa && cd twa
-          bubblewrap init \
-            --manifest https://nigma-family.duckdns.org/manifest.json \
-            --directory . \
-            --packageId com.nigma.family \
-            --name "Семейные дела" \
-            --shortName "Дела" \
-            --themeColor "#03020A" \
-            --backgroundColor "#03020A" \
-            --startUrl "/" \
-            --iconUrl https://nigma-family.duckdns.org/icon-512.png \
-            --maskableIconUrl https://nigma-family.duckdns.org/icon-512.png
-        env:
-          BUBBLEWRAP_SKIP_UPDATE_CHECK: "true"
-
-      - name: Build APK
-        run: |
-          cd twa
-          bubblewrap build --skipPwaValidation
-        env:
-          BUBBLEWRAP_SKIP_UPDATE_CHECK: "true"
+          manifest-url: https://nigma-family.duckdns.org/manifest.json
+          package-id: com.nigma.family
+          signing-key-store-base64: ''
+          signing-key-alias: ''
+          signing-key-store-password: ''
+          signing-key-password: ''
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: family-tasks-apk
-          path: twa/app-release-unsigned.apk
+          path: '**/*.apk'
