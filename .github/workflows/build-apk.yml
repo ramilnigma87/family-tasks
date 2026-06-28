@@ -1,0 +1,41 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Create TWA project
+        run: |
+          mkdir twa && cd twa
+          bubblewrap init --manifest https://nigma-family.duckdns.org/manifest.json --directory .
+        env:
+          BUBBLEWRAP_SKIP_UPDATE_CHECK: true
+
+      - name: Build APK
+        run: cd twa && bubblewrap build
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: family-tasks-apk
+          path: twa/app-release-unsigned.apk
